@@ -99,7 +99,7 @@ micscif_flush(struct file *f, fl_owner_t id)
 	struct endpt *ep;
 
 	priv = (struct mic_priv *)f->private_data;
-	dev = f->f_dentry->d_inode->i_rdev;
+	dev = file_inode(f)->i_rdev;
 	if (MINOR(dev) != 1) // SCIF MINOR
 		return 0;
 

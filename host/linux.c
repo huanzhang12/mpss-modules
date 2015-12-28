@@ -147,7 +147,7 @@ static ssize_t
 mic_read(struct file * filp, char __user *buf,
 		size_t count, loff_t *pos)
 {
-	dev_t dev = filp->f_dentry->d_inode->i_rdev;
+	dev_t dev = filp->f_path.dentry->d_inode->i_rdev;
 	if (MINOR(dev) == 2)
 		return mic_psmi_read(filp, buf, count, pos);
 
@@ -160,7 +160,7 @@ mic_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 	dev_t dev;
 	int status = 0;
 
-	dev = filp->f_dentry->d_inode->i_rdev;
+	dev = filp->f_path.dentry->d_inode->i_rdev;
 	if (MINOR(dev) == 1)
 		return scif_process_ioctl(filp, cmd, arg);
 
@@ -174,14 +174,14 @@ mic_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 static int
 mic_fasync(int fd, struct file *filp, int on)
 {
-	int rc;
+	int rc = 0;
 
 	if ((rc = fasync_helper(fd, filp, on, &mic_data.dd_fasync)) < 0) {
 		return rc;
 	}
 
 	if (on) {
-		rc = __f_setown(filp, task_pid(current), PIDTYPE_PID, 0);
+		__f_setown(filp, task_pid(current), PIDTYPE_PID, 0);
 		filp->private_data = filp;
 	} else {
 		filp->private_data = NULL;
@@ -193,7 +193,7 @@ mic_fasync(int fd, struct file *filp, int on)
 int
 mic_mmap(struct file *f, struct vm_area_struct *vma)
 {
-	dev_t dev = f->f_dentry->d_inode->i_rdev;
+	dev_t dev = file_inode(f)->i_rdev;
 	if (MINOR(dev) == 1)
 		return micscif_mmap(f, vma);
 
@@ -203,7 +203,7 @@ mic_mmap(struct file *f, struct vm_area_struct *vma)
 unsigned int
 mic_poll(struct file *f, poll_table *wait)
 {
-	dev_t dev = f->f_dentry->d_inode->i_rdev;
+	dev_t dev = file_inode(f)->i_rdev;
 	if (MINOR(dev) == 1)
 		return micscif_poll(f, wait);
 
@@ -213,7 +213,7 @@ mic_poll(struct file *f, poll_table *wait)
 int
 mic_flush(struct file *f, fl_owner_t id)
 {
-	dev_t dev = f->f_dentry->d_inode->i_rdev;
+	dev_t dev = file_inode(f)->i_rdev;
 	if (MINOR(dev) == 1)
 		return micscif_flush(f, id);
 
@@ -332,8 +332,9 @@ mic_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 			mic_lindata.dd_dev + 2 + mic_ctx->bd_info->bi_ctx.bi_id,
 			NULL, "mic%d", mic_ctx->bd_info->bi_ctx.bi_id);
 	err = sysfs_create_group(&mic_ctx->bd_info->bi_sysfsdev->kobj, &bd_attr_group);
+
 	mic_ctx->sysfs_state = sysfs_get_dirent(mic_ctx->bd_info->bi_sysfsdev->kobj.sd,
-#if (LINUX_VERSION_CODE > KERNEL_VERSION(2,6,35))
+#if (LINUX_VERSION_CODE > KERNEL_VERSION(2,6,35) && (KERNEL_VERSION(3,13,0) > LINUX_VERSION_CODE))
 				NULL,
 #endif
 				"state");

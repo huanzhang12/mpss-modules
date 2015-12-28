@@ -321,7 +321,7 @@ micveth_probe_int(micveth_info_t *veth_info, mic_ctx_t *mic_ctx)
 		desc->rd_valid = 1;
 	}
 
-	if ((dev_veth = alloc_netdev(sizeof(micveth_info_t), "mic%d", micveth_setup)) == NULL) {
+	if ((dev_veth = alloc_netdev(sizeof(micveth_info_t), "mic%d", NET_NAME_UNKNOWN, micveth_setup)) == NULL) {
 		return -ENOMEM;
 	}
 
@@ -341,7 +341,7 @@ micveth_probe_int(micveth_info_t *veth_info, mic_ctx_t *mic_ctx)
 
 static ssize_t show_veth(struct device *dev,
 			 struct device_attribute *attr, char *buf);
-DEVICE_ATTR(veth, S_IRUGO|S_IWUGO, show_veth, NULL);
+DEVICE_ATTR(veth, S_IRUGO|S_IWUSR|S_IWGRP, show_veth, NULL);
 
 static int
 micveth_init_int(int num_bds, struct device *dev)

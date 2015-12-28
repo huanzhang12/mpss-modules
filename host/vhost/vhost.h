@@ -223,7 +223,7 @@ static inline int vhost_has_feature(struct vhost_dev *dev, int bit)
 	unsigned acked_features = rcu_dereference(dev->acked_features);
 #endif
 #else
-	unsigned acked_features = rcu_dereference_index_check(dev->acked_features, rcu_read_lock_held());
+	unsigned acked_features = smp_load_acquire(&(dev->acked_features));
 #endif
 
 	return acked_features & (1 << bit);

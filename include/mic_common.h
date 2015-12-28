@@ -415,7 +415,7 @@ typedef struct _mic_ctx_t {
 	product_family_t	bi_family;
 	struct board_info	*bd_info;
 	sysfs_info_t		sysfs_info;
-	struct sysfs_dirent	*sysfs_state;
+	struct kernfs_node	*sysfs_state;
 	spinlock_t		sysfs_lock;
 	mic_dma_handle_t	dma_handle;
 	uint32_t		boot_mem;

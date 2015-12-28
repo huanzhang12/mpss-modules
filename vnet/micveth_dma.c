@@ -1030,7 +1030,7 @@ micvnet_init_netdev(struct micvnet_info *vnet_info)
 	struct net_device *dev_vnet;
 	int ret = 0;
 
-	if ((dev_vnet = (struct net_device *)alloc_netdev(sizeof(struct micvnet_info), "mic%d", 
+	if ((dev_vnet = (struct net_device *)alloc_netdev(sizeof(struct micvnet_info), "mic%d", NET_NAME_UNKNOWN,
 					   micvnet_setup)) == NULL) {
 		printk(KERN_ERR "%s: alloc_netdev failed\n", __func__);
 		return -ENOMEM;

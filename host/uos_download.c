@@ -40,6 +40,7 @@
 #include "micint.h"
 #include <linux/virtio_ring.h>
 #include <linux/virtio_blk.h>
+#include <linux/proc_fs.h>
 #include "mic/mic_virtio.h"
 #include "mic/micveth.h"
 
